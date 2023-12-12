@@ -27,7 +27,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes elementos:
 
 1. **Clonar el Repositorio:**
    ```bash
-   git clone https://github.com/FabianRomero5/mvc-project.git
+   git clone https://github.com/FabianRomero5/SPA-Project.git
 Configuración de Variables de Entorno:
 
 Copia el archivo .env.example y renómbralo a .env.
