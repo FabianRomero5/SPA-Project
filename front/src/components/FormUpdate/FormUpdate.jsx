@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import validateForm from '../../utils/validateForm';
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import validateForm from '../../utils/validateFormUpdate';
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import './Form.modules.css';
+import './FormUpdate.modules.css';
 
 const fields = [
   { name: 'firstname', type: 'text', label: 'Firstname', group: 1 },
@@ -11,7 +11,7 @@ const fields = [
     name: "documentType",
     type: 'select',
     label: 'Document Type',
-    options: ["Select",'C.C', 'T.I', 'NIT'],
+    options: ["Select", 'C.C', 'T.I', 'NIT'],
     group: 2,
   },
   { name: 'document', type: 'text', label: 'Document', group: 2 },
@@ -22,10 +22,15 @@ const fields = [
   { name: 'phone', type: 'text', label: 'Phone' },
   { name: 'userName', type: 'text', label: 'User Name' },
   { name: 'password', type: 'password', label: 'Password' },
-  { name: 'confirmPassword', type: 'password', label: 'Confirm password' },
+
 ];
 
-const Form = () => {
+const FormUpdate = () => {
+  const storedUser = localStorage.getItem('userToEdit');
+  const storedUserInfo = JSON.parse(storedUser);
+
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
@@ -38,10 +43,14 @@ const Form = () => {
     phone: "",
     userName: "",
     password: "",
-    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
+
+  console.log(storedUserInfo?.id);
+  console.log(errors);
+
+
 
   const handleInputChange = (property, value) => {
     let updatedForm = { ...form, [property]: value };
@@ -64,7 +73,7 @@ const Form = () => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    axios.post("http://localhost:3001/usermanager/user", form)
+    axios.put(`http://localhost:3001/usermanager/user/${storedUserInfo.id}`, form)
       .then(res => {
         if (res.data && res.status == 200) {
           setForm({
@@ -79,10 +88,9 @@ const Form = () => {
             phone: "",
             userName: "",
             password: "",
-            confirmPassword: "",
           });
-
-          alert("User created successfully!");
+          navigate("/cards");
+          alert("User Updated successfully!");
         }
       }
       ).catch(error => {
@@ -105,10 +113,38 @@ const Form = () => {
     }
   });
 
+  const FillData = () => {
+  
+
+    if (storedUser) {
+     
+
+      const filledForm = {
+        firstname: storedUserInfo.firstname || '',
+        lastname: storedUserInfo.lastname || '',
+        documentType: storedUserInfo.documentType?.name || 'Select',
+        document: storedUserInfo.document || '',
+        dateOfBirth: storedUserInfo.dateOfBirth?.split('T')[0] || '',
+        placeOfBirth: storedUserInfo.placeOfBirth || '',
+        placeOfResidence: storedUserInfo.placeOfResidence?.name || '',
+        email: storedUserInfo.email || '',
+        phone: storedUserInfo.phone || '',
+        userName: storedUserInfo.userName || '',
+        password: storedUserInfo.password || '',
+      };
+
+      setForm(filledForm);
+    }
+  };
+
+  useEffect(() => {
+    FillData();
+  }, []);
+
   return (
     <form className="form" onSubmit={submitHandler}>
-      <p className="title">Register</p>
-      <p className="message">Signup now and get full access to our app.</p>
+      <p className="title">Update</p>
+      <p className="message">Update user info.</p>
 
       {Object.values(groups).map((group, groupIndex) => (
         <div key={groupIndex} className="flex">
@@ -199,4 +235,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default FormUpdate;
